@@ -2,24 +2,11 @@ import './App.css';
 import { useState } from 'react';
 
 function App() {
-  const [steps, updateSteps] = useState(1);
-  const [count, updateCount] = useState(0);
-  const increaseSteps = () => {
-    updateSteps(steps + 1);
+  const [steps, setSteps] = useState(1);
+  const [count, setCount] = useState(0);
+  const increaseSteps = (jump) => {
+    setSteps(jump);
     return;
-  };
-
-  const decreaseSteps = () => {
-    updateSteps(steps - 1);
-    return;
-  };
-
-  const decreaseCount = () => {
-    updateCount(count - steps);
-  };
-
-  const increaseCount = () => {
-    updateCount(count + steps);
   };
 
   function fetchDate(count) {
@@ -28,19 +15,55 @@ function App() {
     return currentDate.toDateString();
   }
 
+  function resetDate() {
+    setCount(0);
+    setSteps(1);
+  }
+
+  function handleUpdateCount(e) {
+    const value = parseInt(e.target.value);
+    if (!value) return;
+
+    setCount(value);
+  }
+
   return (
     <div className="App">
-      <div className="steps">
-        <button onClick={decreaseSteps}>-</button>Steps: {steps}
-        <button onClick={increaseSteps}>+</button>
+      <div>
+        <input
+          type="range"
+          min={1}
+          max={100}
+          value={steps}
+          onInput={(e) => increaseSteps(parseInt(e.target.value))}
+        />{' '}
+        {steps}
       </div>
-      <div className="count">
-        <button onClick={decreaseCount}>-</button> Count: {count}
-        <button onClick={increaseCount}>+</button>
+      <div>
+        <button
+          onClick={() => {
+            setCount(count - steps);
+          }}
+        >
+          -
+        </button>
+        <input
+          type="text"
+          value={count}
+          placeholder="Enter days later"
+          onInput={(e) => handleUpdateCount(e)}
+        />
+        <button
+          onClick={() => {
+            setCount(count + steps);
+          }}
+        >
+          +
+        </button>
       </div>
-      <div className="date">
-        {count > 0 ? count : count * -1} days {count < 0 ? `ago` : `later`} date
-        will be {fetchDate(count)}
+      <div>{fetchDate(count)}</div>
+      <div>
+        <button onClick={() => resetDate()}>Reset</button>
       </div>
     </div>
   );

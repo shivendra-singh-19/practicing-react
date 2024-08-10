@@ -1,23 +1,47 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
 
 function App() {
+  const [steps, updateSteps] = useState(1);
+  const [count, updateCount] = useState(0);
+  const increaseSteps = () => {
+    updateSteps(steps + 1);
+    return;
+  };
+
+  const decreaseSteps = () => {
+    updateSteps(steps - 1);
+    return;
+  };
+
+  const decreaseCount = () => {
+    updateCount(count - steps);
+  };
+
+  const increaseCount = () => {
+    updateCount(count + steps);
+  };
+
+  function fetchDate(count) {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + count);
+    return currentDate.toDateString();
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="steps">
+        <button onClick={decreaseSteps}>-</button>Steps: {steps}
+        <button onClick={increaseSteps}>+</button>
+      </div>
+      <div className="count">
+        <button onClick={decreaseCount}>-</button> Count: {count}
+        <button onClick={increaseCount}>+</button>
+      </div>
+      <div className="date">
+        {count > 0 ? count : count * -1} days {count < 0 ? `ago` : `later`} date
+        will be {fetchDate(count)}
+      </div>
     </div>
   );
 }

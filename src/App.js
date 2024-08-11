@@ -2,37 +2,50 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const initialItems = [
-    {
-      id: 1,
-      description: 'Passport',
-      quantity: 2,
-      packed: false,
-    },
-    {
-      id: 2,
-      description: 'Socks',
-      quantity: 12,
-      packed: false,
-    },
-    {
-      id: 3,
-      description: 'Charger',
-      quantity: 1,
-      packed: true,
-    },
-  ];
+  const [items, setItems] = useState([]);
+
+  function handleAddItems(newItem) {
+    setItems([...items, newItem]);
+  }
+
+  function handleDeleteItems(id) {
+    setItems((items) =>
+      items.filter((item) => {
+        const { id: itemId } = item;
+        if (id == itemId) return false;
+        return true;
+      })
+    );
+  }
+
+  function packedItems(id) {
+    setItems((items) =>
+      items.map((item) => {
+        if (id == item.id) {
+          return {
+            ...item,
+            packed: true,
+          };
+        }
+        return item;
+      })
+    );
+  }
 
   return (
     <div className="App">
-      <Form />
-      <PackagingList items={initialItems} />
+      <Form updateItems={handleAddItems} />
+      <PackagingList
+        items={items}
+        deletingItems={handleDeleteItems}
+        packItems={packedItems}
+      />
       <Stats />
     </div>
   );
 }
 
-function Form() {
+function Form({ updateItems }) {
   const [description, setDescription] = useState('');
   const [count, setCount] = useState(1);
 
@@ -49,8 +62,7 @@ function Form() {
       quantity: count,
       packed: false,
     };
-
-    console.log(newItem);
+    updateItems(newItem);
     setDescription('');
     setCount(1);
   }
@@ -85,23 +97,37 @@ function Form() {
 }
 
 function PackagingList(props) {
-  const { items } = props;
+  const { items, deletingItems, packItems } = props;
   return (
     <div className="list">
       {items.map((item) => {
-        return <Item itemProps={item} key={item.id} />;
+        return (
+          <Item
+            itemProps={item}
+            key={item.id}
+            handleDeleteItems={deletingItems}
+            packItems={packItems}
+          />
+        );
       })}
     </div>
   );
 }
 
 function Item(props) {
-  const { itemProps } = props;
+  const { itemProps, handleDeleteItems, packItems } = props;
   return (
     <div>
+      <input
+        type="checkbox"
+        value={itemProps.packed}
+        onClick={() => packItems(itemProps.id)}
+      />
       <span style={itemProps.packed ? { textDecoration: 'line-through' } : {}}>
         {itemProps.quantity} {itemProps.description}{' '}
-        <button>{itemProps.packed ? `✅` : `❌`}</button>
+        <button onClick={() => handleDeleteItems(itemProps.id)}>
+          {itemProps.packed ? `✅` : `❌`}
+        </button>
       </span>
     </div>
   );
